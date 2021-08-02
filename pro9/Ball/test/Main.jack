@@ -1,0 +1,21 @@
+class Main{
+    function void main()
+    {  var int i;
+       let i=0;
+       var boolean move;
+       move=true;
+
+       while(true){
+           if(move)
+           {   let i=i+1;
+               do Screen.drawRectangle(i,0,10,10);
+           }
+           if(i=245)
+           {
+               let move=false;
+           }
+       }
+       
+       return;
+     }
+}

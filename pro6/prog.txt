@@ -1,0 +1,552 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <bitset>
+#include <regex>
+#include <bits/stdc++.h>
+#include <ctype.h>
+//standard header files *************************************************
+#include "A_instruction.cpp"
+#include "C_instruction.cpp"
+#include "data.cpp"
+#include "A_handler.cpp"
+#include "A_manager.cpp"
+#include "C_handler.cpp"
+#include "first_scan.cpp"
+#include "routien.cpp"
+
+
+using namespace std;
+
+
+
+
+void ui()
+{
+  cout<<"*********************************************************************************\n";
+  cout<<"HI,THIS IS THIS IS ASSEMBLER SOFTWARE FOR 16 BIT HACK COMPUTER\n";
+  cout<<"**********************************************************************************\n";
+  cout<<"->make sure that assembly code you written exist in current directory\n";
+  cout<<"->out put file will be in current directory after this software terminats\n";
+  cout<<"->this softare do not debug the code you wrote \n";
+  cout<<"***********************************************************************************\n";
+  cout<<"************************************************************************************\n";
+  cout<<"ENTER THE FILE NAME::::::";
+  cin>>file_name;
+  cout<<"\n";
+
+}
+
+int main()
+{
+//command line user interface
+ui();
+routien obj;
+return 0;
+}
+
+namespace A{
+
+
+struct symbols{
+  std::string name;
+  int val;
+};
+
+symbols symbol[1000]={
+  {"R0",0},
+  {"R1",1},
+  {"R2",2},
+  {"R3",3},
+  {"R4",4},
+  {"R5",5},
+  {"R6",6},
+  {"R7",7},
+  {"R8",8},
+  {"R9",9},
+  {"R10",10},
+  {"R11",11},
+  {"R12",12},
+  {"R13",13},
+  {"R14",14},
+  {"R15",15},
+  {"SP",0},
+  {"LCL",1},
+  {"ARG",2},
+  {"THIS",3},
+  {"THAT",4},
+  {"SCREEN",16384},
+  {"KBD",24576},
+};
+
+
+
+int sym_cout=23;
+int valu=16;
+
+
+}
+
+
+//C_type instruction is in form of 111 a c1 c2 c3 c4 c5 c6 d1 d2 d3 j1 j2 j3
+
+struct comps{
+  std::string sym;
+  std::string val;// a c1 c2 c3 c4 c5 c6
+};
+
+comps comp[30]={
+   {"0","0101010"},
+   {"1","0111111"},
+   {"-1","0111010"},
+   {"D","0001100"},
+   {"A","0110000"},
+   {"!D","0001101"},
+   {"!A","0110001"},
+   {"-D","0001111"},
+   {"-A","0110011"},
+   {"D+1","0011111"},
+   {"A+1","0110111"},
+   {"D-1","0001110"},
+   {"A-1","0110010"},
+   {"D+A","0000010"},
+   {"D-A","0010011"},
+   {"A-D","0000111"},
+   {"D&A","0000000"},
+   {"D|A","0010101"},
+   {"M","1110000"},
+   {"!M","1110001"},
+   {"-M","1110011"},
+   {"M+1","1110111"},
+   {"M-1","1110010"},
+   {"D+M","1000010"},
+   {"D-M","1010011"},
+   {"M-D","1000111"},
+   {"D&M","1000000"},
+   {"D|M","1010101"}
+};
+
+
+//dest
+
+
+struct dests{
+  std::string sym;
+  std::string val;
+};
+
+
+dests dest[8]={
+
+  {"M","001"},
+  {"D","010"},
+  {"MD","011"},
+  {"A","100"},
+  {"AM","101"},
+  {"AD","110"},
+  {"AMD","111"},
+};
+
+
+//this is handler for A A_instruction
+//#include <bitset>
+
+class A_handler{
+private:
+  std::string a_string;
+  int addr;
+  std::string binary;
+public:
+  A_handler(std::string a_str)
+  {
+    this->a_string=a_str;
+    num_conv();
+    binarize();
+
+  }
+
+  void num_conv()
+  { this->a_string[0]='0';
+    this->addr=std::stoi(this->a_string);
+  }
+
+  void binarize()
+  {
+    binary=std::bitset<15>(this->addr).to_string();
+  }
+
+  std::string output()
+  {
+    return "0"+this->binary;
+  }
+
+
+
+};
+
+//this is utility to handle C_instruction
+//this file includes C_instruction.cpp which contains data files
+//string.h files should be included
+//I AM ALSO SORRY THAT ALGORITHMS USED IS NOT SO OPTIMIZE
+//TIPS FOR OPTIMIZATON
+//U CAN REPLACE LINEAR SEARCH INTO BINARY SEARCH
+
+//C instruction structure
+//
+//#include <iostream>
+//#include <string> //included for testing purpose only
+//#include "C_instruction.cpp"
+//#include<bits/stdc++.h>
+//#include <bitset>
+using namespace std;
+
+class C_handler{
+private:
+  std::string c_str;
+  int posx=0;
+  int posy=0;
+
+public:
+  C_handler(std::string c_str)
+  {
+    this->c_str=c_str;
+    this->out();
+
+
+
+  }
+  //in C_instruction,three tables are defined for ::control bits(a c1 c2 c3 c4 c5 c6) in structure comp {string "sym",string "val"}
+  //                                              ::destination in structure dest {string "sym",string "val"}
+  //                                              ::jump in structre jump {string "sym",string "val"}
+
+
+  //parsing of destination bits
+
+  //linear search for finding string bits corresponding to destination bits d1 d2 d3*******************************************************
+  std::string dest_bits(std::string s)
+  {  int i;
+
+     std::string out="000";
+    for(i=0;i<8;i++)
+    {
+      if(s==dest[i].sym)
+      {
+        out=dest[i].val;
+
+        break;
+      }
+    }
+
+    return out;
+  }
+  //dest_linear_search********************************************************************************************************************
+  //function to return destination bits
+  std::string dest_()
+  {
+    //if '=' exist in the command that implies c_commond consists destination or else "000"
+    std::string dest_str=this->c_str;
+
+    int i,p;
+    for(i=1;i<=4;i++)
+    {
+      if(dest_str[i]=='=')
+      {
+        p=i;
+
+        break;
+      }
+    }
+
+    switch (p) {
+
+      case 1:{
+
+        std::string s;
+        dest_str=s+this->c_str[0];
+        this->posx=2;
+        dest_str=dest_bits(dest_str);
+
+
+        break;
+      }
+      case 2:{
+       dest_str=this->c_str.substr(0,2);
+       this->posx=3;
+       dest_str=dest_bits(dest_str);
+
+        break;
+
+      }
+      case 3:
+      {
+
+       dest_str=this->c_str.substr(0,3);
+       this->posx=4;
+       //cout<<dest_str<<"\n";
+       dest_str=dest_bits(dest_str);
+
+        break;
+      }
+      default:{
+        this->posx=0;
+        dest_str="000";}
+    }
+
+     //cout<<this->posx<<"\n";
+    return dest_str;
+  }
+  //destination function *****************************************************************************************************
+  //**************************************************************************************************************************
+  //parsing of jump bits
+
+  //linear search for finding string bits corresponding to destination bits j1 j2 j3*******************************************************
+  std::string jump_bits(std::string s)
+  {  int i;
+
+     std::string out="000";
+    for(i=0;i<8;i++)
+    {
+      if(s==jump[i].sym)
+      {
+        out=jump[i].val;
+
+        break;
+      }
+    }
+
+    return out;
+  }
+  //dest_linear_search********************************************************************************************************************
+  //function to return destination bits
+  std::string jump_()
+  {
+    //if '=' exist in the command that implies c_commond consists destination or else "000"
+    std::string jump_str=this->c_str;
+
+    if(jump_str[this->c_str.length()-4]==';')
+    {
+      jump_str=this->c_str.substr(this->c_str.length()-3,this->c_str.length()-1);
+      this->posy=this->c_str.length()-4;
+
+      jump_str=jump_bits(jump_str);
+
+
+
+
+    }
+    else
+    { this->posy=c_str.length();
+      jump_str="000";
+
+    }
+
+  //  cout<<this->posy<<"\n";
+
+    return jump_str;
+  }
+
+  //*****************************************************************************************************************************************
+  //******************************************************************************************************************************************
+
+  //functon to parse control bits
+  std::string comp_bits(std::string s)
+  {  int i;
+
+       std::string out;
+    for(i=0;i<28;i++)
+    {
+      if(s==comp[i].sym)
+      {
+        out=comp[i].val;
+
+        break;
+      }
+    }
+
+    return out;
+  }
+
+
+  std::string c_extract(std::string str,int x,int y)
+  {
+    int i;
+    std::string line;
+    for(i=x;i<y;i++)
+    {
+      std::string temp=" ";
+      temp[0]=str[i];
+      line=line+temp;
+
+    }
+
+    return line;
+  }
+
+
+  std::string comp_() {
+
+    return comp_bits(c_extract(this->c_str,this->posx,this->posy));
+  }
+
+  std::string out()
+  { std::string dest=dest_();
+    std::string jump=jump_();
+    std::string comp=comp_();
+    //cout<<comp<<" "<<dest<<" "<<jump<<"\n";
+    return "111"+comp+dest+jump;
+  }
+
+};
+
+//#include <string>
+using namespace std;
+namespace DATA{
+std::string file_name;
+}
+
+#include <fstream>
+//#include <string>
+//#include <iostream>
+//#include "A_instruction.cpp"
+using namespace std;
+using namespace A;
+class first_scan{
+private:
+  int cl=0;
+  int no=0;
+  std::string file_name;
+
+
+
+
+public:
+ first_scan(std::string file_name)
+ { this->file_name=file_name;
+   core();
+ }
+  //*************************************************************************************
+  //************************************************************************************
+  std::string getvar(std::string l)
+  {  int p,q,i;
+          for(i=2;i<l.length();i++)
+         {
+           if(l[i]==')')
+           {
+             q=i;
+              break;
+           }}
+  return l.substr(1,q-1);
+  }
+
+
+     void insert(std::string s)
+     {
+        A::symbol[A::sym_cout]={s,this->cl-this->no};
+        A::sym_cout++;
+
+     }
+
+
+//****************************************************************************************
+//***************************************************************************************
+
+
+
+
+  void core(){
+
+  std::ifstream fin(file_name);
+  while(!fin.eof())
+  {
+    std::string line,temp;
+    getline(fin,line);
+    if(line.length()==1||line[0]=='/')
+    {
+      this->no++;
+    }
+    if(line[0]=='(')
+    {
+
+    temp=getvar(line);
+    insert(temp);
+     this->no++;
+  }
+
+
+  //#include <fstream>
+  //include "data.cpp"
+  //#include "first_scan.cpp"
+  //#include "A_manager.cpp"
+  //#include "C_handler.cpp"
+
+  using namespace DATA;
+
+
+  class routien{
+    public:
+      routien()
+          {
+            first_scan obj(DATA::file_name);
+            init();
+
+          }
+          std::string c_filter(std::string str)
+          {  int i;
+             for(i=0;i<str.length();i++)
+             {
+               if(str[i]==' ')
+               {
+                 break;
+               }
+             }
+            return str.substr(0,i);
+          }
+
+
+     void init()
+     {
+       ifstream fin(DATA::file_name);
+       cout<<">>opening file "+DATA::file_name+"\n";
+       ofstream fout("out");
+       int i=0;
+       while(!fin.eof())
+       {  std::string line;
+         getline(fin,line);
+
+
+
+        std::string temp=line;
+
+
+         if(temp[0]=='/'||temp.length()==1||temp[0]=='('||temp.length()==0);
+         else
+         {
+            temp=c_filter(line);
+            //cout<<temp<<"\n";
+            //cout<<temp.length()<<"\n";
+            if(temp[0]=='@')
+            {
+               A_manager obj1(temp.substr(0,temp.length()-1));
+
+             fout<<obj1.output_()<<"\n";
+
+            }
+            else{
+
+
+               C_handler obj2(temp.substr(0,temp.length()-1));
+
+               fout<<obj2.out()<<"\n";
+            }
+         }
+
+
+
+         }
+
+       }
+
+
+
+
+  };

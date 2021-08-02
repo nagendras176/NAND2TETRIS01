@@ -1,0 +1,11 @@
+//AND GATE WHICH INTAKES FOUR BITS OF INFORMATION
+
+CHIP And4Way{
+
+IN a,b,c,d;
+OUT out;
+PARTS:
+And(a=a,b=b,out=o1);
+And(a=c,b=d,out=o2);
+And(a=o1,b=o2,out=out);
+}

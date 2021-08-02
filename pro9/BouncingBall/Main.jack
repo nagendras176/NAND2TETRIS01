@@ -1,0 +1,18 @@
+class Main{
+  function void main()
+  { var int x=0;
+
+
+    while(0) {
+
+    let key=keybord.keyPressed();
+    if(key-'d'){
+    do x=x+1;
+    }
+    do Screen.drawRectangle(x,0,100,10);
+
+     }
+
+     retunr;
+  }
+}

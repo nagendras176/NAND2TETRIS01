@@ -1,0 +1,33 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/Inc16.hdl
+
+/**
+ * 16-bit incrementer:
+ * out = in + 1 (arithmetic addition)
+ */
+
+CHIP Inc16 {
+    IN in[16];
+    OUT out[16];
+
+    PARTS:
+   IncBlock(in=in[0],inc=true,out=out[0],outinc=o1);
+   IncBlock(in=in[1],inc=o1,out=out[1],outinc=o2);
+   IncBlock(in=in[2],inc=o2,out=out[2],outinc=o3);
+   IncBlock(in=in[3],inc=o3,out=out[3],outinc=o4);
+   IncBlock(in=in[4],inc=o4,out=out[4],outinc=o5);
+   IncBlock(in=in[5],inc=o5,out=out[5],outinc=o6);
+   IncBlock(in=in[6],inc=o6,out=out[6],outinc=o7);
+   IncBlock(in=in[7],inc=o7,out=out[7],outinc=o8);
+   IncBlock(in=in[8],inc=o8,out=out[8],outinc=o9);
+   IncBlock(in=in[9],inc=o9,out=out[9],outinc=o10);
+   IncBlock(in=in[10],inc=o10,out=out[10],outinc=o11);
+   IncBlock(in=in[11],inc=o11,out=out[11],outinc=o12);
+   IncBlock(in=in[12],inc=o12,out=out[12],outinc=o13);
+   IncBlock(in=in[13],inc=o13,out=out[13],outinc=o14);
+   IncBlock(in=in[14],inc=o14,out=out[14],outinc=o15);
+   IncBlock(in=in[15],inc=o15,out=out[15],outinc=false);
+
+}

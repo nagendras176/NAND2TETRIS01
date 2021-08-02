@@ -1,0 +1,8 @@
+//OR GATE WHICH TAKE 3 inputs
+CHIP Or3Way{
+IN a,b,c;
+OUT out;
+PARTS:
+Or(a=a,b=b,out=o);
+Or(a=o,b=c,out=out);
+}

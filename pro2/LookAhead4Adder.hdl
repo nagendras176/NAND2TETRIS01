@@ -1,0 +1,30 @@
+CHIP LookAhead4Adder{
+
+IN a[4],b[4],cin;
+OUT sum[4],cout;
+
+PARTS:
+HalfAdder(a=a[0],b=b[0],sum=p1,carry=g1);
+HalfAdder(a=a[1],b=b[1],sum=p2,carry=g2);
+HalfAdder(a=a[2],b=b[2],sum=p3,carry=g3);
+HalfAdder(a=a[3],b=b[3],sum=p4,carry=g4);
+Xor(a=p1,b=cin,out=sum[0]);
+//c2
+And(a=p1,b=cin,out=tempc2);
+Or(a=g1,b=tempc2,out=c2);
+Xor(a=p2,b=c2,out=sum[1]);
+//c3
+And3Way(a=p2,b=p1,c=cin,out=tempc31);
+And(a=p2,b=g1,out=tempc32);
+Or3Way(a=g2,b=tempc32,c=tempc31,out=c3);
+Xor(a=p3,b=c3,out=sum[2]);
+//c4
+And4Way(a=p3,b=p2,c=p1,d=cin,out=tempc41);
+And3Way(a=p3,b=p2,c=g1,out=tempc42);
+And(a=p3,b=g2,out=tempc43);
+Or4Way(a=g3,b=tempc43,c=tempc42,d=tempc41,out=c4);
+Xor(a=p4,b=c4,out=sum[3]);
+//cout
+And(a=p4,b=c4,out=o);
+Or(a=g4,b=o,out=cout);
+}

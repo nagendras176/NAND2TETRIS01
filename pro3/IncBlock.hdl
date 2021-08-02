@@ -1,0 +1,13 @@
+//two input(inc,in) output(outinc,out)
+
+CHIP IncBlock{
+
+IN in,inc;
+OUT outinc,out;
+
+PARTS:
+
+Xor(a=inc,b=in,out=out);
+And(a=inc,b=in,out=outinc);
+
+}

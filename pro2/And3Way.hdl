@@ -1,0 +1,11 @@
+//AND GATE OF THREE bits
+
+CHIP And3Way{
+
+IN a,b,c;
+OUT out;
+
+PARTS:
+And(a=a,b=b,out=o);
+And(a=o,b=c,out=out);
+}
